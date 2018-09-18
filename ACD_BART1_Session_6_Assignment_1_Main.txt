@@ -1,0 +1,200 @@
+﻿Session 6 – Visualization
+      and Plotting
+     Assignment - 1
+Contents
+
+  Introduction ..................................................................................................................................................... 2
+
+  Objective .......................................................................................................................................................... 2
+
+  Prerequisites .................................................................................................................................................... 2
+
+  Associated Data Files ....................................................................................................................................... 2
+
+  Problem Statement ......................................................................................................................................... 2
+
+  Expected Output .............................................................................................................................................. 2
+
+
+
+
+   Copyrights© 2017, AcadGild. All Rights Reserved                                                                                                                1
+   Introduction
+This assignment will help you to understand the key concepts learnt in this session.
+
+
+   Objective
+This assignment will test your skills on Visualization and Plotting operations in R.
+
+
+   Prerequisites
+Not Applicable
+
+
+   Associated Data Files
+Not Applicable
+
+
+   Problem Statement
+1. Import the Titanic Dataset from the link Titanic Data Set.
+Perform the following:
+ a. Preprocess the passenger names to come up with a list of titles that represent families
+     and represent using appropriate visualization graph.
+
+Answer:
+> titanic <- read.delim("C:/Users/Manish Chugh/Desktop/ACADGILD/titanic.txt")
+>   View(titanic)
+> install.packages("caret")
+> library(caret)
+
+> str(titanic)
+'data.frame':	1309 obs. of  15 variables:
+ $ pclass   : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ survived : int  1 1 0 0 0 1 1 0 1 0 ...
+ $ Family   : Factor w/ 875 levels "Abbing","Abbott",..: 16 17 17 17 17 21 25 25 28 31 ...
+ $ Name     : Factor w/ 1142 levels " Capt. Edward Gifford",..: 149 52 185 570 1030 544 223 871 992 796 ...
+ $ sex      : Factor w/ 2 levels "female","male": 1 2 1 2 1 2 1 2 1 2 ...
+ $ age      : num  29 0.917 2 30 25 ...
+ $ sibsp    : int  0 1 1 1 1 0 1 0 2 0 ...
+ $ parch    : int  0 2 2 2 2 0 0 0 0 0 ...
+ $ ticket   : Factor w/ 929 levels "110152","110413",..: 188 50 50 50 50 125 93 16 77 826 ...
+ $ fare     : num  211 152 152 152 152 ...
+ $ cabin    : Factor w/ 187 levels "","A10","A11",..: 45 81 81 81 81 151 147 17 63 1 ...
+ $ embarked : Factor w/ 4 levels "","C","Q","S": 4 4 4 4 4 4 4 4 4 2 ...
+ $ boat     : Factor w/ 28 levels "","1","10","11",..: 13 4 1 1 1 14 3 1 28 1 ...
+ $ body     : int  NA NA NA 135 NA NA NA NA NA 22 ...
+ $ home.dest: Factor w/ 370 levels "","?Havana, Cuba",..: 310 232 232 232 232 238 163 25 23 230 ...
+> 
+
+> titanicDF<-read.csv('C:/Users/Manish Chugh/Desktop/ACADGILD/titanic.txt')
+> titanicDF
+> print(str(titanicDF))
+'data.frame':	1309 obs. of  1 variable:
+ $ pclass.survived.Family.Name.sex.age.sibsp.parch.ticket.fare.cabin.embarked.boat.body.home.dest: Factor w/ 1309 levels "1\t0\tAllison\t Miss. Helen Loraine\tfemale\t2\t1\t2\t113781\t151.5500\tC22 C26\tS\t\t\tMontreal, PQ / Chesterville, ON",..: 124 125 1 2 3 126 127 4 128 5 ...
+NULL
+
+# Name Title Extraction
+
+titles <- apply(titanic,1,function(row){
+  strsplit(strsplit(as.character(row['Name']),', ')[[1]][2],'\\.')[[1]][1]
+})
+titles
+> summary(titles)
+> as.factor(titles)
+> summary(as.factor(titles))
+
+##         Capt          Col          Don           Dr     Jonkheer 
+##            1            2            1            7            1 
+##         Lady        Major       Master         Miss         Mlle 
+##            1            2           40          182            2 
+##          Mme           Mr          Mrs           Ms          Rev 
+##            1          517          125            1            6 
+##          Sir the Countess 
+##            1            1
+
+## preprocessing function
+extractAndConvertTitles <- function(titanicDF){
+  titles <- apply(titanicDF,1,function(row){
+    strsplit(strsplit(as.character(row['Name']),', ')[[1]][2],'\\.')[[1]][1]
+  })
+  keep_titles <- c('Dr','Master', 'Miss', 'Mr', 'Mrs')
+  replacementTitles <- list(Mlle = 'Miss', Mme = 'Mrs', Sir = 'Mr', Ms = 'Miss')
+  for(r_title in names(replacementTitles)){
+    titles[titles == r_title] <- replacementTitles[[r_title]]
+  }
+  
+  # convert all the other remaining titles to 'Rare Title'
+  titles[!titles %in% keep_titles] = 'Rare Title'
+  titanic$Title <- as.factor(titles)
+  invisible(titanic)
+}
+titanicDF <- extractAndConvertTitles(titanicDF)
+titanicDF
+titanicDF$Name <- NULL
+summary(titanicDF$Title[titanicDF$mode == 'Training'])
+summary(titanicDF$Title)
+
+##         Dr     Master       Miss         Mr        Mrs Rare Title 
+##          7         40        185        518        126         15
+
+Barplot is saved as .png file in GitHub ID: https://github.com/Manishchugh79/DATA-ANALYTICS-WITH-R-EXCEL-TABLEAU_Session6Assignment6.1
+
+
+
+
+ b. Represent the proportion of people survived from the family size using a graph.
+
+Answer: 
+
+# Loading Packages & Library:
+
+library(ggplot2)
+install.packages("ggthemes")
+library(ggthemes)
+library(scales)
+library(dplyr)
+install.packages("mice")
+library(mice)
+install.packages("randomForest")
+library(randomForest)
+
+
+# Load and explore data
+
+> train <- read.csv('C:/Users/Manish Chugh/Desktop/ACADGILD/titanic.txt', stringsAsFactors = F, na.strings=c("","NA"))
+> test <- read.csv('C:/Users/Manish Chugh/Desktop/ACADGILD/titanic.txt', stringsAsFactors = F, na.strings=c("","NA"))
+> 
+
+# combine training and test data
+> full <- bind_rows(train, test)
+
+# data summary
+str(test)
+str(train)
+
+# Read the dataset into R:
+<-read.csv("titanic.txt")
+train
+
+# identifying columns
+colnames(train)
+##  [1] "PassengerId" "Survived"    "Pclass"      "Name"        "Sex"        
+##  [6] "Age"         "SibSp"       "Parch"       "Ticket"      "Fare"       
+## [11] "Cabin"       "Embarked"
+
+# finding no. of survived and died
+table(train$survived)
+0   1 
+549 342
+
+# finding passender class distribuion
+table(train$pclass)
+1   2   3 
+216 184 491
+
+
+# finding no. of survived and dies for each pclass category
+train$pclass <- as.factor(train$pclass)
+table(train$pclass,train$survived)
+    0   1
+1  80 136
+2  97  87
+3 372 119
+
+train$survived <- as.factor(train$survived)
+
+Barplot is saved as .png file in GitHub ID: https://github.com/Manishchugh79/DATA-ANALYTICS-WITH-R-EXCEL-TABLEAU_Session6Assignment6.1
+
+
+ c. Impute the missing values in Age variable using Mice Library, create two different
+     graphs showing Age distribution before and after imputation.
+
+
+   Expected Output
+Not Applicable
+
+
+
+
+  Copyrights© 2017, AcadGild. All Rights Reserved                                             2
+
