@@ -188,7 +188,16 @@ Barplot is saved as .png file in GitHub ID: https://github.com/Manishchugh79/DAT
 
  c. Impute the missing values in Age variable using Mice Library, create two different
      graphs showing Age distribution before and after imputation.
-
+     
+Answer:     
+# Age Imputation
+lmPSS <-lm(age~pclass + survived, data = titanic)
+lmPSS
+titanic$age <- predict(lmPSS, newdata = titanic)
+titanic$age
+titanic[titanic$PassengerId %in% titanic$PassengerId, "age"] <- titanic$Age
+titanic[titanic$PassengerId %in% titanic$PassengerId, "age"]
+titanic$age
 
    Expected Output
 Not Applicable
